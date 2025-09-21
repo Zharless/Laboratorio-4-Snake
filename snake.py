@@ -9,13 +9,30 @@ Exercises
 """
 
 from random import randrange
-from turtle import *
-
+from turtle import (
+    update,
+    ontimer,
+    setup,
+    hideturtle,
+    tracer,
+    listen,
+    onkey,
+    clear,
+    done,
+)
 from freegames import square, vector
 
+# Constants
+BOUND_MIN = -200
+BOUND_MAX_X = 190
+BOUND_MAX_Y = 190
+STEP = 10
+TICK_MS = 100
+
+# Game state
 food = vector(0, 0)
-snake = [vector(10, 0)]
-aim = vector(0, -10)
+snake = [vector(STEP, 0)]
+aim = vector(0, -STEP)
 
 
 def change(x, y):
@@ -25,8 +42,11 @@ def change(x, y):
 
 
 def inside(head):
-    """Return True if head inside boundaries."""
-    return -200 < head.x < 190 and -200 < head.y < 190
+    """Return True if head is inside boundaries."""
+    return (
+        BOUND_MIN < head.x < BOUND_MAX_X
+        and BOUND_MIN < head.y < BOUND_MAX_Y
+    )
 
 
 def move():
@@ -35,36 +55,37 @@ def move():
     head.move(aim)
 
     if not inside(head) or head in snake:
-        square(head.x, head.y, 9, 'red')
+        square(head.x, head.y, 9, "red")
         update()
         return
 
     snake.append(head)
 
     if head == food:
-        print('Snake:', len(snake))
-        food.x = randrange(-15, 15) * 10
-        food.y = randrange(-15, 15) * 10
+        print("Snake:", len(snake))
+        food.x = randrange(-15, 15) * STEP
+        food.y = randrange(-15, 15) * STEP
     else:
         snake.pop(0)
 
     clear()
 
     for body in snake:
-        square(body.x, body.y, 9, 'black')
+        square(body.x, body.y, 9, "black")
 
-    square(food.x, food.y, 9, 'green')
+    square(food.x, food.y, 9, "green")
     update()
-    ontimer(move, 100)
+    ontimer(move, TICK_MS)
 
 
+# Boot
 setup(420, 420, 370, 0)
 hideturtle()
 tracer(False)
 listen()
-onkey(lambda: change(10, 0), 'Right')
-onkey(lambda: change(-10, 0), 'Left')
-onkey(lambda: change(0, 10), 'Up')
-onkey(lambda: change(0, -10), 'Down')
+onkey(lambda: change(STEP, 0), "Right")
+onkey(lambda: change(-STEP, 0), "Left")
+onkey(lambda: change(0, STEP), "Up")
+onkey(lambda: change(0, -STEP), "Down")
 move()
 done()
